@@ -1,0 +1,13 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/EmployeeManagement/.vs/EmployeeManagement
+/EmployeeManagement/EmployeeManagementService/obj/Debug
+/EmployeeManagement/EmployeeManagementWeb/bin
+/EmployeeManagement/EmployeeManagementWeb/obj/Debug
+/EmployeeManagement/EmployeeManagementService/bin/Debug
+/EmployeeManagement/EmployeeManagementService/.vs
+/EmployeeManagement/EmployeeManagementWeb/.vs
+/EmployeeManagement/EmployeeManagementWeb/EmployeeManagementWeb.csproj.user

@@ -1,0 +1,96 @@
+﻿
+@{
+    ViewBag.Title = "Working Days";
+}
+
+
+<div class="container">
+    <h2>Working Day Calculation</h2>
+    <div class="mt-3">
+        <div class="row mt-3">
+            <div class="col-md-1">
+                <label for="fromDate">From</label>
+            </div>
+            <div class="col-md-5">
+                <input type="date" class="form-control" id="fromDate" name="fromDate" />
+            </div>
+            <div class="col-md-1">
+                <label for="toDate">To</label>
+            </div>
+            <div class="col-md-5">
+                <input type="date" class="form-control" id="toDate" name="toDate" />
+            </div>
+        </div>
+        <div id="errorSection" class="row mt-5" style="background-color:indianred;display:none;">
+            <label id="errorMessage"></label>
+        </div>
+        <div class="row mt-3" id="displayDay" style="background-color:mediumseagreen;display:none;">
+                <div class="col-md-2">
+                    <label for="noOfworkingDays">No.of Working Days : </label>
+                </div>
+                <div class="col-md-2">
+                    <label for="workingDays" id="workingDays"></label>
+                </div>
+        </div>
+        <hr style="color:green" />
+
+        <div class="row mt-3">
+            <div class="col-md-12" style="display: flex; justify-content: center;">
+                <button type="button" id="workingDayBtn" class="btn btn-primary mb-2" onclick="calculateWorkingDays()">Calculate Working Days</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    console.log("Call");
+
+    function calculateWorkingDays() {
+        console.log("second");
+        var fromDate = $('#fromDate').val();
+        var toDate = $('#toDate').val();
+
+        //display error message function
+        function displayErrorMessage(msg) {
+            $('#errorMessage').text(msg);
+            $('#errorSection').show();
+            $('#displayDay').hide();
+            $('#workingDays').text('');
+        }
+
+        if (fromDate === '') {
+            displayErrorMessage("From date can not be empty!");
+            return false;
+        }
+        else if (toDate === '') {
+            displayErrorMessage("To date can not be empty!");
+            return false;
+        }        
+        else if (fromDate >= toDate) {
+            displayErrorMessage("From date must be less than To date!");
+            return false;
+        }
+        $.ajax({
+            url: '@Url.HttpRouteUrl("ActionApi", new {controller = "WorkingDayCalculations", action = "WorkingDayCalculation", area = "" })?fromDate=' + fromDate + '&toDate=' + toDate,
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (response) {
+                debugger;
+                if (response == -1) {
+                    displayErrorMessage("From Date Should not be Weekend!");
+
+                }
+                else {
+                    $('#errorSection').hide();
+                    $('#displayDay').show();
+                    $('#workingDays').text(response);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Something went wrong!");
+            }
+        });
+    }
+</script>
