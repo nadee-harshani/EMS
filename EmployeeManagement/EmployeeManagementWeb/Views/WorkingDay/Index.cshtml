@@ -1,8 +1,7 @@
 ﻿
 @{
-    ViewBag.Title = "Working Days";
+    ViewBag.Title = "Working Day";
 }
-
 
 <div class="container">
     <h2>Working Day Calculation</h2>
@@ -45,10 +44,7 @@
 
 <script>
 
-    console.log("Call");
-
     function calculateWorkingDays() {
-        console.log("second");
         var fromDate = $('#fromDate').val();
         var toDate = $('#toDate').val();
 
@@ -65,7 +61,7 @@
             return false;
         }
         else if (toDate === '') {
-            displayErrorMessage("To date can not be empty!");
+            displayErrorMessage("From date can not be empty!");
             return false;
         }        
         else if (fromDate >= toDate) {
@@ -77,19 +73,17 @@
             type: 'GET',
             contentType: 'application/json',
             success: function (response) {
-                debugger;
-                if (response == -1) {
-                    displayErrorMessage("From Date Should not be Weekend!");
-
+                if (response.Error) {
+                    displayErrorMessage(response.Error);
                 }
                 else {
                     $('#errorSection').hide();
                     $('#displayDay').show();
-                    $('#workingDays').text(response);
+                    $('#workingDays').text(response.NoOfWorkingDay);
                 }
             },
             error: function (xhr, status, error) {
-                console.error("Something went wrong!");
+                displayErrorMessage(error);
             }
         });
     }

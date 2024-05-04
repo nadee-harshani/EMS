@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "Employee Data";
+    ViewBag.Title = "Employee";
 }
 
 <div class="container">
@@ -17,12 +17,12 @@
         <tbody></tbody>
     </table>
 </div>
-<div class="modal fade" id="employeeModal" tabindex="-1" role="dialog" aria-labelledby="employeeModalLabel" aria-hidden="true">
+<div class="modal fade" id="employeeModal" tabindex="-1" role="dialog" aria-labelledby="employeeModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="employeeModalLabel">Add Employee</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -30,25 +30,43 @@
                 <!-- Form for adding/editing employee -->
                 <form id="employeeForm">
                     <div class="form-group">
-                        <label for="name">Name:</label>
-                        <input type="text" class="form-control" id="name" name="name">
-                        <label id="nameValidation" style="color:red;display:none">Name is Required</label>
+                        <div class="row mt-3">
+                            <div class="col-md-2">
+                                <label for="name">Name</label>
+                            </div>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" id="name" name="name">
+                                <label id="nameValidation" style="color:red;display:none">Name is Required</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" class="form-control" id="email" name="email">
-                        <label id="emailValidation" style="color:red;display:none">Email is Required</label>
+                        <div class="row mt-3">
+                            <div class="col-md-2">
+                                <label for="email">Email</label>
+                            </div>
+                            <div class="col-md-10">
+                                <input type="email" class="form-control" id="email" name="email">
+                                <label id="emailValidation" style="color:red;display:none">Email is Required</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="position">Position:</label>
-                        <input type="text" class="form-control" id="position" name="position">
-                        <label id="positionValidation" style="color:red;display:none">Position is Required</label>
+                        <div class="row mt-3">
+                            <div class="col-md-2">
+                                <label for="position">Position</label>
+                            </div>
+                            <div class="col-md-10">
+                                <input type="text" class="form-control" id="position" name="position">
+                                <label id="positionValidation" style="color:red;display:none">Position is Required</label>
+                            </div>
+                        </div>
                     </div>
                     <input type="hidden" id="employeeId">
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" id="saveEmployeeBtn">Save</button>
             </div>
         </div>
@@ -67,7 +85,6 @@
         url: '@Url.HttpRouteUrl("ActionApi", new {controller = "Employees", action = "GetAll", area = "" })',
         type: 'GET',
         success: function (data) {
-            console.log(data);
             $('#employeeTable tbody').empty();
             $.each(data, function (index, employee) {
                 $('#employeeTable tbody').append(`
@@ -89,27 +106,37 @@
         }
     });
 
-        function preventModalClose() {
-            $('#employeeModal').modal({ backdrop: 'static', keyboard: false }); // Prevent closing on ESC key and outside click
-            $('#employeeModal').on('click', function (e) {
-                if ($(e.target).hasClass('modal')) {
-                    e.stopPropagation(); // Stop propagation if the click event is on the modal itself
-                }
-            });
+        //email validation
+        function emailValidation(email) {
+            var pattern= /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
+            return pattern.test(email);
+        }
+
+        //check input values contain only whitespaces 
+        function checkWhitepace(string) {
+            var regexString = /^\s*$/;
+            return regexString.test(string);
+        }
+
+        //Hide Error Labels
+        function hideErrorLable() {
+            $('#nameValidation').hide();
+            $('#emailValidation').hide();
+            $('#positionValidation').hide();
         }
 
         // Open modal to add employee
         $('#addEmployeeBtn').click(function () {
-            preventModalClose();
             $('#employeeModalLabel').text('Add Employee');
+            hideErrorLable();
             $('#employeeForm')[0].reset();
             $('#employeeModal').modal('show');
         });
 
         // Open modal to edit employee
         $(document).on('click', '.editEmployeeBtn', function () {
-            preventModalClose();
             $('#employeeModalLabel').text('Edit Employee');
+            hideErrorLable();
             $('#employeeId').val($(this).data('id'));
             $('#name').val($(this).data('name'));
             $('#email').val($(this).data('email'));
@@ -123,28 +150,28 @@
             var name = $('#name').val();
             var email = $('#email').val();
             var position = $('#position').val();
-            
+
 
             //name validation
-            if (!name) {
+            if (!name || checkWhitepace(name)) {
                 $('#nameValidation').show();
                 return false;
             } else {
                 $('#nameValidation').hide();
             }
-            if (!email) {
+            if (!email || checkWhitepace(email)) {
                 $('#emailValidation').show();
                 return false;
             }
             else {
                 $('#emailValidation').hide();
             }
-            //if (!email.test(email)) {
-            //    $('#emailValidation').text("Invalid email format.")
-            //    $('#emailValidation').show();
-            //    return false;
-            //}
-            if (!position) {
+            if (!emailValidation(email)) {
+                $('#emailValidation').text("Invalid email format.")
+                $('#emailValidation').show();
+                return false;
+            }
+            if (!position || checkWhitepace(position)) {
                 $('#positionValidation').show();
                 return false;
             } else {
@@ -173,7 +200,6 @@
                 success: function () {
                     populateEmployees();
                     $('#employeeModal').modal('hide');
-                    //$('#employeeModal').hide();
                 },
                 error: function (xhr, status, error) {
                     console.error('Error saving employee:', error);
@@ -198,13 +224,4 @@
             }
         });
     }
-
-    function checkWhitepace(string) {
-        var regexString = /^\s*$/;
-        if (regexString.test(string)) {
-            return false;
-        }
-    }
-
-
 </script>

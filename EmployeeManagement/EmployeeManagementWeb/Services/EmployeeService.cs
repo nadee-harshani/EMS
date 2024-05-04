@@ -4,6 +4,8 @@ using EmployeeManagementWeb.Models.DTOs;
 using EmployeeManagementWeb.Services.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
 
@@ -18,82 +20,132 @@ namespace EmployeeManagementWeb.Services
             this.employeeRepository = employeeRepository;
         }
 
+        //get all employee list
         public IEnumerable<EmployeeDto> GetAllEmployee()
         {
-            var employeeList = employeeRepository.GetAll();
-            var employees = new List<EmployeeDto>();
-            //map domain model to dto
-            foreach (var employee in employeeList)
+            try
             {
-                employees.Add(new EmployeeDto()
+                var employeeList = employeeRepository.GetAll();
+                var employees = new List<EmployeeDto>();
+                //map domain model to dto
+                foreach (var employee in employeeList)
                 {
-                    Id = employee.Id,
-                    Name = employee.Name,
-                    Email = employee.Email,
-                    Designation = employee.Designation
-                });
+                    employees.Add(new EmployeeDto()
+                    {
+                        Id = employee.Id,
+                        Name = employee.Name,
+                        Email = employee.Email,
+                        Designation = employee.Designation
+                    });
+                }
+                return employees;
             }
-            return employees;
-        }
-
-        public EmployeeDto GetEmployeeById(int id) {
-
-            var employee = employeeRepository.GetById(id);
-            //map domain model to dto
-            if(employee != null) {
-                return new EmployeeDto()
-                {
-                    Id = employee.Id,
-                    Name = employee.Name,
-                    Email = employee.Email,
-                    Designation = employee.Designation
-                };
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("Application", "An error occurred: " + ex.Message, EventLogEntryType.Error);
             }
             return null;
         }
 
+        //Get employee details by employee id
+        public EmployeeDto GetEmployeeById(int id) {
+
+            try
+            {
+                var employee = employeeRepository.GetById(id);
+                //map domain model to dto
+                if (employee != null)
+                {
+                    return new EmployeeDto()
+                    {
+                        Id = employee.Id,
+                        Name = employee.Name,
+                        Email = employee.Email,
+                        Designation = employee.Designation
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("Application", "An error occurred: " + ex.Message, EventLogEntryType.Error);
+            }
+            return null;
+        }
+
+        //Create new employee
         public EmployeeDto CreateEmployee(EmployeeDto employeeDto)
         {
-            //map dto object to domain model
-            var employee = new Employee()
+            try
             {
-                Name = employeeDto.Name,
-                Email = employeeDto.Email,
-                Designation = employeeDto.Designation,
-                CreatedDateTime = DateTime.Now,
-            };
-
-            employeeRepository.Create(employee);
-            return employeeDto;
+                //map dto object to domain model
+                var employee = new Employee()
+                {
+                    Name = employeeDto.Name,
+                    Email = employeeDto.Email,
+                    Designation = employeeDto.Designation,
+                    CreatedDateTime = DateTime.Now,
+                };
+                employee = employeeRepository.Create(employee);
+                if (employee != null)
+                {
+                    employeeDto.Id = employee.Id;
+                }
+                return employeeDto;
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("Application", "An error occurred: " + ex.Message, EventLogEntryType.Error);
+            }
+            return null;
         }
 
+        //Update Employee record
         public EmployeeDto UpdateEmployee(EmployeeDto employeeDto)
         {
-            //map dto object to domain model
-            var employee = new Employee()
+            try
             {
-                Id = employeeDto.Id,
-                Name = employeeDto.Name,
-                Email = employeeDto.Email,
-                Designation = employeeDto.Designation,
-            };
+                //map dto object to domain model
+                var employee = new Employee()
+                {
+                    Id = employeeDto.Id,
+                    Name = employeeDto.Name,
+                    Email = employeeDto.Email,
+                    Designation = employeeDto.Designation,
+                };
 
-            employeeRepository.Update(employee);
-            return employeeDto;
+                employee = employeeRepository.Update(employee);
+                if (employee != null)
+                {
+                    return employeeDto;
+                }
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("Application", "An error occurred: " + ex.Message, EventLogEntryType.Error);
+            }
+            return null;
         }
 
+        //Delete employee
         public EmployeeDto DeleteEmployee(int id)
         {
-            var employee = employeeRepository.Delete(id);
-            if(employee != null)
+            try
             {
-                return new EmployeeDto()
+                var employee = employeeRepository.Delete(id);
+                if (employee != null)
                 {
-                    Id = employee.Id,
-                    Name = employee.Name,
-                    Email = employee.Email,
-                    Designation = employee.Designation
-                };
+                    return new EmployeeDto()
+                    {
+                        Id = employee.Id,
+                        Name = employee.Name,
+                        Email = employee.Email,
+                        Designation = employee.Designation
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("Application", "An error occurred: " + ex.Message, EventLogEntryType.Error);
             }
             return null;
         }

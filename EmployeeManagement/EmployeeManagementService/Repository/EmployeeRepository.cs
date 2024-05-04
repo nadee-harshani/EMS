@@ -2,6 +2,7 @@
 using EmployeeManagementService.Repository.Interface;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,38 +22,68 @@ namespace EmployeeManagementService.Repository
         //Get All Active Employees
         public IEnumerable<Employee> GetAll()
         {
-            var employees = dbContext.Employees.Where(x => x.DeletedDateTime==null).ToList();
-            return employees;
+            try
+            {
+                var employees = dbContext.Employees.Where(x => x.DeletedDateTime == null).ToList();
+                return employees;
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("Application", "An error occurred: " + ex.Message, EventLogEntryType.Error);
+            }
+            return null;
         }
 
         //Create Employee
         public Employee Create(Employee employee)
         {
-            dbContext.Employees.Add(employee);
-            dbContext.SaveChanges();
-
-            return employee;
+            try
+            {
+                dbContext.Employees.Add(employee);
+                dbContext.SaveChanges();
+                return employee;
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("Application", "An error occurred: " + ex.Message, EventLogEntryType.Error);
+            }
+            return null;
         }
 
         //Get Employee By Id
         public Employee GetById(int id)
         {
-            return dbContext.Employees.Find(id);
-            
+            try
+            {
+                return dbContext.Employees.Find(id);
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("Application", "An error occurred: " + ex.Message, EventLogEntryType.Error);
+            }
+            return null;
+
         }
 
         //Update Employee data
         public Employee Update(Employee employee)
         {
-            var existingEmp = dbContext.Employees.Find(employee.Id);
-            if (existingEmp != null)
+            try
             {
-                existingEmp.Name = employee.Name;
-                existingEmp.Email = employee.Email;
-                existingEmp.Designation = employee.Designation;
+                var existingEmp = dbContext.Employees.Find(employee.Id);
+                if (existingEmp != null)
+                {
+                    existingEmp.Name = employee.Name;
+                    existingEmp.Email = employee.Email;
+                    existingEmp.Designation = employee.Designation;
 
-                dbContext.SaveChanges();
-                return employee;
+                    dbContext.SaveChanges();
+                }
+                return existingEmp;
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("Application", "An error occurred: " + ex.Message, EventLogEntryType.Error);
             }
             return null;
         }
@@ -60,12 +91,19 @@ namespace EmployeeManagementService.Repository
         //Delete Employee
         public Employee Delete(int id)
         {
-            var existingEmp = dbContext.Employees.Find(id);
-            if (existingEmp != null)
+            try
             {
-                existingEmp.DeletedDateTime = DateTime.Now;
-                dbContext.SaveChanges();
+                var existingEmp = dbContext.Employees.Find(id);
+                if (existingEmp != null)
+                {
+                    existingEmp.DeletedDateTime = DateTime.Now;
+                    dbContext.SaveChanges();
+                }
                 return existingEmp;
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("Application", "An error occurred: " + ex.Message, EventLogEntryType.Error);
             }
             return null;
         }
