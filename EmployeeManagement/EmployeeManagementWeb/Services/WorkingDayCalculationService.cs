@@ -27,8 +27,8 @@ namespace EmployeeManagementWeb.Services
             if (holidays == null)
             {
                 var holidayList = holidayRepository.GetAll().Select(x => x.HolidayDate.Date.ToString()).ToList();
-                //add holiday list to memory for 30 mins
-                CacheManagementService.AddToCache("holidays", holidayList, DateTimeOffset.Now.AddMinutes(30));
+                //add holiday list to memory for 5 mins
+                CacheManagementService.AddToCache("holidays", holidayList, DateTimeOffset.Now.AddMinutes(5));
                 holidays = CacheManagementService.GetFromCache<List<string>>("holidays");
             }
             return holidays;

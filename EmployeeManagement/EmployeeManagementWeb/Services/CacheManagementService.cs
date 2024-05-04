@@ -13,7 +13,7 @@ namespace EmployeeManagementWeb.Services
             cache.Add(key, value, expiredTime);
         }
 
-        //Get vaqlues from cache
+        //Get values from cache
         public static T GetFromCache<T>(string key)
         {
             return (T)cache[key];
